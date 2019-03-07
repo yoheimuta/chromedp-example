@@ -4,7 +4,12 @@
 
 Scraping specific sneakers' bid price list in StockX:
 
-- ex. https://stockx.com/buy/air-jordan-1-retro-high-og-defiant-couture
+- How to work:
+  - Go to https://stockx.com/buy/air-jordan-1-retro-high-og-defiant-couture.
+  - Wait to complete loading the confirmation page.
+  - Click the confirm button.
+  - Wait to complete loading the size list page.
+  - Retrieve the sizes and prices.
 
 ## Setup
 
