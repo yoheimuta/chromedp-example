@@ -33,7 +33,10 @@ docker run -d -p 9222:9222 --rm --name headless-shell chromedp/headless-shell
 ## Run
 
 ```bash
-go run cmds/stockx/main.go
+go run cmd/stockx/main.go
+
+# faster implementation. This use the cookie to skip the confirmation page.
+go run cmd/faststockx/main.go
 ```
 
 ## Testing

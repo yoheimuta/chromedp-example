@@ -5,9 +5,9 @@ import (
 	"testing"
 
 	"github.com/yoheimuta/chromedp-example/app/scrapingapp"
-	"github.com/yoheimuta/chromedp-example/repository/scraper/expchromedp"
-
 	"github.com/yoheimuta/chromedp-example/repository/db/expmockdb"
+	"github.com/yoheimuta/chromedp-example/repository/scraper/expchromedp"
+	"github.com/yoheimuta/chromedp-example/repository/scraper/expfastchromedp"
 )
 
 type mockableDBClient struct {
@@ -39,13 +39,25 @@ func TestApp_GetBuyShoes(t *testing.T) {
 			t.Errorf("got err %v", err)
 		}
 	}()
-	db := &mockableDBClient{}
 
-	app := scrapingapp.NewApp(scraper, db)
+	fastScraper, err := expfastchromedp.NewClient(ctx)
+	if err != nil {
+		t.Errorf("got err %v", err)
+		return
+	}
+	defer func() {
+		err = fastScraper.Close(ctx)
+		if err != nil {
+			t.Errorf("got err %v", err)
+		}
+	}()
+
+	db := &mockableDBClient{}
 
 	for _, test := range []struct {
 		name             string
 		inputURLs        []string
+		inputScraper     scrapingapp.Scraper
 		wantVariantCount []int
 	}{
 		{
@@ -53,14 +65,33 @@ func TestApp_GetBuyShoes(t *testing.T) {
 			inputURLs: []string{
 				`https://stockx.com/buy/air-jordan-1-retro-high-og-defiant-couture`,
 			},
+			inputScraper:     scraper,
 			wantVariantCount: []int{17},
 		},
 		{
-			name: "Got 2 url",
+			name: "Got 2 urls",
 			inputURLs: []string{
 				`https://stockx.com/buy/air-jordan-1-retro-high-og-defiant-couture`,
 				`https://stockx.com/buy/adidas-yeezy-boost-700-salt`,
 			},
+			inputScraper:     scraper,
+			wantVariantCount: []int{17, 25},
+		},
+		{
+			name: "Got 1 url with the cookie to skip the confirmation page",
+			inputURLs: []string{
+				`https://stockx.com/buy/air-jordan-1-retro-high-og-defiant-couture`,
+			},
+			inputScraper:     fastScraper,
+			wantVariantCount: []int{17},
+		},
+		{
+			name: "Got 2 urls with the cookie to skip the confirmation page",
+			inputURLs: []string{
+				`https://stockx.com/buy/air-jordan-1-retro-high-og-defiant-couture`,
+				`https://stockx.com/buy/adidas-yeezy-boost-700-salt`,
+			},
+			inputScraper:     fastScraper,
 			wantVariantCount: []int{17, 25},
 		},
 	} {
@@ -68,6 +99,7 @@ func TestApp_GetBuyShoes(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			db.urls = test.inputURLs
 
+			app := scrapingapp.NewApp(test.inputScraper, db)
 			got, err := app.GetBuyShoes(ctx)
 			if err != nil {
 				t.Errorf("got err %v", err)
