@@ -24,3 +24,9 @@ docker run -d -p 9222:9222 --rm --name headless-shell chromedp/headless-shell
 ```bash
 go run cmds/stockx/main.go
 ```
+
+## Testing
+
+```bash
+go test -v -count 1 -timeout 240s -race ./...
+```

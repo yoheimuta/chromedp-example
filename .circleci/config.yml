@@ -1,0 +1,21 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/golang:1.11.4
+      - image: chromedp/headless-shell
+    working_directory: /go/src/github.com/yoheimuta/chromedp-example
+    steps:
+      - checkout
+      - run:
+          name: Wait for headless-shell
+          command: dockerize -wait tcp://127.0.0.1:9222 -timeout 10s
+      - run:
+          name: Run tests
+          command: go test -v -count 1 -timeout 240s -race ./...
+workflows:
+  version: 2
+  testing:
+    jobs:
+      - test
+
