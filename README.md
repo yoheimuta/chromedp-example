@@ -1,5 +1,11 @@
 # chromedp-example
 
+[![CircleCI](https://circleci.com/gh/yoheimuta/chromedp-example.svg?style=svg)](https://circleci.com/gh/yoheimuta/chromedp-example)
+
+Scraping specific sneakers' bid price list in StockX:
+
+- ex. https://stockx.com/buy/air-jordan-1-retro-high-og-defiant-couture
+
 ## Setup
 
 Set the project root path to GOPATH.
