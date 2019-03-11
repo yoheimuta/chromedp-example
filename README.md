@@ -32,11 +32,20 @@ docker run -d -p 9222:9222 --rm --name headless-shell chromedp/headless-shell
 
 ## Run
 
+There are 3 main.go which use different logic to demonstrate how to utilize the chromedp.
+
+In fact, each code differs only repository injected in main.go.
+
 ```bash
+# normal implementation.
 go run cmd/stockx/main.go
 
-# faster implementation. This use the cookie to skip the confirmation page.
+# faster implementation. This uses the cookie to skip the confirmation page.
 go run cmd/faststockx/main.go
+
+# concurrent support implementation. This is more performant.
+## NOTE: This uses a local chrome app.
+go run cmd/concurrentstockx/main.go
 ```
 
 ## Testing

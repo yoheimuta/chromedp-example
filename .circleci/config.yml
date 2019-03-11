@@ -2,7 +2,7 @@ version: 2
 jobs:
   test:
     docker:
-      - image: circleci/golang:1.11.4
+      - image: circleci/golang:1.11.4-browsers
       - image: chromedp/headless-shell
     working_directory: /go/src/github.com/yoheimuta/chromedp-example
     steps:
