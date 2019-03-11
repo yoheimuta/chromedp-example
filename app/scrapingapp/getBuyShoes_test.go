@@ -5,7 +5,7 @@ import (
 	"log"
 	"testing"
 
-	"github.com/yoheimuta/chromedp-example/repository/scraper/expcncchromedp"
+	"github.com/yoheimuta/chromedp-example/repository/scraper/expparchromedp"
 
 	"github.com/yoheimuta/chromedp-example/app/scrapingapp"
 	"github.com/yoheimuta/chromedp-example/repository/db/expmockdb"
@@ -55,9 +55,9 @@ func TestApp_GetBuyShoes(t *testing.T) {
 		}
 	}()
 
-	concurrentScraper := expcncchromedp.NewClient(
-		expcncchromedp.WithLog(log.Printf),
-		expcncchromedp.WithPortRange(10000, 20000),
+	parallelScraper := expparchromedp.NewClient(
+		expparchromedp.WithLog(log.Printf),
+		expparchromedp.WithPortRange(10000, 20000),
 	)
 
 	db := &mockableDBClient{}
@@ -103,20 +103,20 @@ func TestApp_GetBuyShoes(t *testing.T) {
 			wantVariantCount: []int{17, 25},
 		},
 		{
-			name: "Got 1 url with concurrent mode",
+			name: "Got 1 url with parallel mode",
 			inputURLs: []string{
 				`https://stockx.com/buy/air-jordan-1-retro-high-og-defiant-couture`,
 			},
-			inputScraper:     concurrentScraper,
+			inputScraper:     parallelScraper,
 			wantVariantCount: []int{17},
 		},
 		{
-			name: "Got 2 urls with concurrent mode",
+			name: "Got 2 urls with parallel mode",
 			inputURLs: []string{
 				`https://stockx.com/buy/air-jordan-1-retro-high-og-defiant-couture`,
 				`https://stockx.com/buy/adidas-yeezy-boost-700-salt`,
 			},
-			inputScraper:     concurrentScraper,
+			inputScraper:     parallelScraper,
 			wantVariantCount: []int{17, 25},
 		},
 	} {

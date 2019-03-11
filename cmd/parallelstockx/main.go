@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/yoheimuta/chromedp-example/repository/scraper/expcncchromedp"
+	"github.com/yoheimuta/chromedp-example/repository/scraper/expparchromedp"
 
 	"github.com/yoheimuta/chromedp-example/app/scrapingapp"
 	"github.com/yoheimuta/chromedp-example/infra/expjson"
@@ -21,9 +21,9 @@ func do() error {
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 
-	scraper := expcncchromedp.NewClient(
-		expcncchromedp.WithLog(log.Printf),
-		expcncchromedp.WithPortRange(10000, 20000),
+	scraper := expparchromedp.NewClient(
+		expparchromedp.WithLog(log.Printf),
+		expparchromedp.WithPortRange(10000, 20000),
 	)
 	db := expmockdb.NewClient()
 
