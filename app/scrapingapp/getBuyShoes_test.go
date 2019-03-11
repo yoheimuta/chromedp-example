@@ -2,7 +2,10 @@ package scrapingapp_test
 
 import (
 	"context"
+	"log"
 	"testing"
+
+	"github.com/yoheimuta/chromedp-example/repository/scraper/expcncchromedp"
 
 	"github.com/yoheimuta/chromedp-example/app/scrapingapp"
 	"github.com/yoheimuta/chromedp-example/repository/db/expmockdb"
@@ -28,7 +31,7 @@ func TestApp_GetBuyShoes(t *testing.T) {
 	t.Parallel()
 
 	ctx := context.Background()
-	scraper, err := expchromedp.NewClient(ctx)
+	scraper, err := expchromedp.NewClient(ctx, expchromedp.WithLog(log.Printf))
 	if err != nil {
 		t.Errorf("got err %v", err)
 		return
@@ -40,7 +43,7 @@ func TestApp_GetBuyShoes(t *testing.T) {
 		}
 	}()
 
-	fastScraper, err := expfastchromedp.NewClient(ctx)
+	fastScraper, err := expfastchromedp.NewClient(ctx, expfastchromedp.WithLog(log.Printf))
 	if err != nil {
 		t.Errorf("got err %v", err)
 		return
@@ -51,6 +54,11 @@ func TestApp_GetBuyShoes(t *testing.T) {
 			t.Errorf("got err %v", err)
 		}
 	}()
+
+	concurrentScraper := expcncchromedp.NewClient(
+		expcncchromedp.WithLog(log.Printf),
+		expcncchromedp.WithPortRange(10000, 20000),
+	)
 
 	db := &mockableDBClient{}
 
@@ -94,6 +102,23 @@ func TestApp_GetBuyShoes(t *testing.T) {
 			inputScraper:     fastScraper,
 			wantVariantCount: []int{17, 25},
 		},
+		{
+			name: "Got 1 url with concurrent mode",
+			inputURLs: []string{
+				`https://stockx.com/buy/air-jordan-1-retro-high-og-defiant-couture`,
+			},
+			inputScraper:     concurrentScraper,
+			wantVariantCount: []int{17},
+		},
+		{
+			name: "Got 2 urls with concurrent mode",
+			inputURLs: []string{
+				`https://stockx.com/buy/air-jordan-1-retro-high-og-defiant-couture`,
+				`https://stockx.com/buy/adidas-yeezy-boost-700-salt`,
+			},
+			inputScraper:     concurrentScraper,
+			wantVariantCount: []int{17, 25},
+		},
 	} {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
@@ -106,14 +131,18 @@ func TestApp_GetBuyShoes(t *testing.T) {
 				return
 			}
 
-			if len(got) != len(test.wantVariantCount) {
-				t.Errorf("got %d, but want %d", len(got), len(test.wantVariantCount))
-				return
+			gotM := make(map[string]int)
+			for _, p := range got {
+				gotM[p.URL] = len(p.Variants)
 			}
-			for i := 0; i < len(test.wantVariantCount); i++ {
-				if len(got[i].Variants) != test.wantVariantCount[i] {
-					t.Errorf("got %d, but want %d", len(got[i].Variants), test.wantVariantCount[i])
-					return
+			for i, url := range test.inputURLs {
+				l, ok := gotM[url]
+				if !ok {
+					t.Errorf("not found %s in map", url)
+					continue
+				}
+				if l != test.wantVariantCount[i] {
+					t.Errorf("got %d, but want %d", l, test.wantVariantCount[i])
 				}
 			}
 		})

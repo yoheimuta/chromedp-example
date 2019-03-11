@@ -62,11 +62,5 @@ func (c *Client) Close(
 	if err != nil {
 		return err
 	}
-
-	// wait for chrome to finish
-	err = c.cdp.Wait()
-	if err != nil {
-		return err
-	}
 	return nil
 }

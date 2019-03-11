@@ -16,20 +16,8 @@ func (a *App) GetBuyShoes(
 	if err != nil {
 		return nil, err
 	}
-
-	var products []*shoes.Product
-	for _, url := range urls {
-		variants, err := a.scraper.ScrapeBuyShoesVariants(
-			ctx,
-			url,
-		)
-		if err != nil {
-			return nil, err
-		}
-		products = append(products, &shoes.Product{
-			URL:      url,
-			Variants: variants,
-		})
-	}
-	return products, nil
+	return a.scraper.ScrapeBuyShoesProducts(
+		ctx,
+		urls,
+	)
 }

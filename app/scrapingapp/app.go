@@ -7,11 +7,11 @@ import (
 )
 
 type Scraper interface {
-	ScrapeBuyShoesVariants(
+	ScrapeBuyShoesProducts(
 		ctx context.Context,
-		shoesURL string,
+		shoesURLs []string,
 	) (
-		[]*shoes.Variant,
+		[]*shoes.Product,
 		error,
 	)
 }

@@ -10,7 +10,31 @@ import (
 	"github.com/yoheimuta/chromedp-example/infra/expchromedp"
 )
 
-func (c *Client) ScrapeBuyShoesVariants(
+func (c *Client) ScrapeBuyShoesProducts(
+	ctx context.Context,
+	shoesURLs []string,
+) (
+	[]*shoes.Product,
+	error,
+) {
+	var products []*shoes.Product
+	for _, url := range shoesURLs {
+		variants, err := c.scrapeBuyShoesVariants(
+			ctx,
+			url,
+		)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, &shoes.Product{
+			URL:      url,
+			Variants: variants,
+		})
+	}
+	return products, nil
+}
+
+func (c *Client) scrapeBuyShoesVariants(
 	ctx context.Context,
 	shoesURL string,
 ) (
