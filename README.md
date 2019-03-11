@@ -43,9 +43,9 @@ go run cmd/stockx/main.go
 # faster implementation. This uses the cookie to skip the confirmation page.
 go run cmd/faststockx/main.go
 
-# concurrent support implementation. This is more performant.
+# parallel support implementation. This is more performant.
 ## NOTE: This uses a local chrome app.
-go run cmd/concurrentstockx/main.go
+go run cmd/parallelstockx/main.go
 ```
 
 ## Testing

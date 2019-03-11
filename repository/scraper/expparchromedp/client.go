@@ -1,4 +1,4 @@
-package expcncchromedp
+package expparchromedp
 
 import (
 	"github.com/chromedp/chromedp"
