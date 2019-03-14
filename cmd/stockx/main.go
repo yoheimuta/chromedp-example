@@ -31,9 +31,13 @@ func do() error {
 		ctx2, cancel := context.WithTimeout(context.Background(), *timeout)
 		defer cancel()
 
-		err := scraper.Close(ctx2)
-		if err != nil {
-			log.Printf("Close err=%v\n", err)
+		err2 := scraper.Close(ctx2)
+		if err2 != nil {
+			if err != nil {
+				log.Printf("Close err=%v\n", err2)
+			} else {
+				err = err2
+			}
 		}
 	}()
 	db := expmockdb.NewClient()

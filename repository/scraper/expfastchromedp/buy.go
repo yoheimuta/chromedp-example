@@ -55,11 +55,11 @@ func (c *Client) scrapeBuyShoesVariants(
 	priceTextsSel := `//div[@class='tile-inner']/div[@class='tile-subvalue']/div/text()`
 	err = c.cdp.Run(ctx, chromedp.Tasks{
 		chromedp.ActionFunc(func(ctxt context.Context, h cdp.Executor) error {
-			success, err := network.SetCookie("stockx_seen_bid_new_info", "true").
+			success, err2 := network.SetCookie("stockx_seen_bid_new_info", "true").
 				WithDomain(u.Hostname()).
 				Do(ctxt, h)
-			if err != nil {
-				return err
+			if err2 != nil {
+				return err2
 			}
 			if !success {
 				return fmt.Errorf("could not set cookie")
