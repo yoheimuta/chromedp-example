@@ -4,11 +4,13 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/chromedp/cdproto/cdp"
-	"github.com/yoheimuta/chromedp-example/infra/expchromedp"
+	"golang.org/x/sync/errgroup"
 
+	"github.com/chromedp/cdproto/cdp"
 	"github.com/chromedp/chromedp"
+
 	"github.com/yoheimuta/chromedp-example/domain/shoes"
+	"github.com/yoheimuta/chromedp-example/infra/expchromedp"
 )
 
 func (c *Client) ScrapeBuyShoesProducts(
@@ -32,38 +34,40 @@ func (c *Client) ScrapeBuyShoesProducts(
 	}()
 
 	// loop over the URLs
-	productChan := make(chan *shoes.Product)
-	errorChan := make(chan error)
+	productChan := make(chan *shoes.Product, len(shoesURLs))
+	eg := errgroup.Group{}
 	for _, url := range shoesURLs {
 		url := url
-		go func() {
-			vs, err := c.scrapeBuyShoesVariants(
+		eg.Go(func() error {
+			vs, err2 := c.scrapeBuyShoesVariants(
 				ctx,
 				pool,
 				url,
 			)
-			if err != nil {
-				errorChan <- err
+			if err2 != nil {
+				return err2
 			}
 			productChan <- &shoes.Product{
 				URL:      url,
 				Variants: vs,
 			}
-		}()
+			return nil
+		})
 	}
 
 	// wait for to finish
+	if err = eg.Wait(); err != nil {
+		return nil, err
+	}
+
 	var products []*shoes.Product
-	for i := 0; i < len(shoesURLs); i++ {
-		select {
-		case p := <-productChan:
-			products = append(products, p)
-		case err := <-errorChan:
-			return nil, err
+	for p := range productChan {
+		products = append(products, p)
+		if len(products) == len(shoesURLs) {
+			break
 		}
 	}
 	close(productChan)
-	close(errorChan)
 
 	return products, nil
 }
